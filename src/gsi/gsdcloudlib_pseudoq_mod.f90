@@ -32,7 +32,8 @@ module gsdcloudlib_pseudoq_mod
 
 contains
 
-SUBROUTINE cloudCover_Surface_col(mype,nsig,&
+SUBROUTINE cloudCover_Surface_col(mype,nsig, &
+                        i_cloud_q_innovation,&
                         cld_bld_hgt,h_bk,zh,  &
                         NVARCLD_P,ocld,Oelvtn,&
                         wthr_type,pcp_type_obs,     &
@@ -57,6 +58,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig,&
 !   input argument list:
 !     mype        - processor ID
 !     nsig        - no. of levels
+!     i_cloud_q_innovation  - flag to control building/clearing/both 
 !     cld_bld_hgt - Height below which cloud building is done
 !
 !     h_bk        - 3D background height  (m)
@@ -96,6 +98,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig,&
 
   integer(i_kind),intent(in) :: mype
   integer(i_kind),intent(in) :: nsig
+  integer(i_kind),intent(in) :: i_cloud_q_innovation
   real(r_kind),   intent(in) :: cld_bld_hgt
 !
 !  surface observation
@@ -159,7 +162,13 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig,&
               write(6,*) (ocld(k),k=1,12)
               call stop2(114)
            endif
+
         enddo
+
+        ! cloud clearing obs
+        if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
+            cld_cover_obs=0.0_r_single
+        endif
 
 ! -- Now consider non-clear obs
 !    --------------------------
@@ -203,6 +212,8 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig,&
                        if(k==8)  underlim=95.0_r_kind    ! 3000 feet
                        if(k>=9 .and. k<nsig-1) underlim=(h_bk(k+1)-h_bk(k))*0.8_r_kind
                        if (zdiff<underlim) then
+                          !build cloud
+                          if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==21) then
                           !double check logic for following if statement
                           if((cl_base_ista >= 1.0_r_kind .and. (firstcloud==0 .or. abs(zdiff)<cloud_dz)) .or. &
                              (cl_base_ista < 1.0_r_kind  .and. (abs(zdiff)<cloud_dz)) ) then
@@ -233,7 +244,19 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig,&
                              kcld=k
                              firstcloud = firstcloud + 1
                           endif  ! zdiff < cloud_dz
-                       endif  ! underlim
+                          endif ! i_cloud_q_innovation=20or21
+                       else
+                          !clear up to cloud base of first cloud level
+                          if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
+                             if (ic==1) cld_cover_obs(k)=0.0_r_single
+                             if (ocld(ic) == 1) pcp_type_obs(k)=0
+                             if (ocld(ic) == 3 .or. ocld(ic) == 4) then
+                                if (wthr_type > 10 .and. wthr_type < 20 .or. wthr_type == 1 ) then
+                                   pcp_type_obs(k)=1
+                                endif
+                             endif
+                          endif
+                       endif  ! zdiff<underlim
                     endif ! firstcloud
                  enddo  ! end K loop
 

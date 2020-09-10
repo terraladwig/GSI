@@ -257,7 +257,7 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
          allocate(cdiagbuf(nobs*nsig),rdiagbuf(nreal,nobs*nsig))
          rdiagbuf=zero
      endif
-     if (i_cloud_q_innovation == 2 .or. i_cloud_q_innovation == 3) then
+     if (i_cloud_q_innovation .ge. 20 .or. i_cloud_q_innovation == 3) then
          iip=0
          allocate(cdiagbufp(nobs*nsig),rdiagbufp(nreal,nobs*nsig))
          cdiagbufp="EMPTY"
@@ -445,7 +445,7 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
              cycle
          endif
    
-         call cloudCover_surface_col(mype,nsig,cld_bld_hgt,h_bk,z_bk, &
+         call cloudCover_surface_col(mype,nsig,i_cloud_q_innovation,cld_bld_hgt,h_bk,z_bk, &
                  nvarcld_p,ocld,oelvtn,wthr_type,pcp_type_obs,vis2qc,cld_cover_obs)
    
    
@@ -500,8 +500,8 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
                 muse(i)=.true.
    
            !*******************************************************************************
-               if (i_cloud_q_innovation /= 2) then
-                   write(*,*) "Warning - setupcldtot: this code version is only designed for i_cloud_q_innovation == 2"
+               if (i_cloud_q_innovation .lt. 20 .or. i_cloud_q_innovation .gt. 22 ) then
+                   write(*,*) "Warning - setupcldtot: this code version is only designed for i_cloud_q_innovation == 20,21,22"
                    return
                else
    
@@ -683,7 +683,7 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
 
   !! Write information to diagnostic file
   if(conv_diagsave)then
-     if (i_cloud_q_innovation == 2 .and. iip>0) then
+     if (i_cloud_q_innovation .ge. 20 .and. iip>0) then
          call dtime_show(myname,'diagsave:q',i_q_ob_type)
         if(netcdf_diag) call nc_diag_write
         if(binary_diag)then

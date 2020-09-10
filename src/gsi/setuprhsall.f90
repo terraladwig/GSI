@@ -646,7 +646,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
 
 !             Set up metar cloud pseudo obs
               else if(obstype=='mta_cld') then
-                 if(i_cloud_q_innovation==2) then
+                 if(i_cloud_q_innovation .ge. 20) then
                     call setupcldtot(lunin,mype,bwork,awork(1,i_cldtot),nele,nobs,is,conv_diagsave)
                  else
                     read(lunin,iostat=ier)
@@ -743,7 +743,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
   if (light_diagsave) close(55)
 
   if(.not.(l_PBL_pseudo_SurfobsT  .or.  l_PBL_pseudo_SurfobsQ   .or. &
-           l_PBL_pseudo_SurfobsUV .or. (i_cloud_q_innovation==2)) ) then
+           l_PBL_pseudo_SurfobsUV .or. (i_cloud_q_innovation .ge. 20)) ) then
      call obsdiags_sort()
   endif
 
