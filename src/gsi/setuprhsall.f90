@@ -248,6 +248,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
   character(10)::obstype
   character(20)::isis
   character(128):: diag_conv_file
+  character(128):: diag_cld_file
   character(128):: diag_light_file
   character(len=12) :: clfile
 
@@ -442,8 +443,12 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
         write(string,900) jiter
 900     format('conv_',i2.2)
         diag_conv_file=trim(dirname) // trim(string)
+        write(string,917) jiter
+917     format('cld_',i2.2)
+        diag_cld_file=trim(dirname) // trim(string)
         if(init_pass) then
            open(7,file=trim(diag_conv_file),form='unformatted',status='unknown',position='rewind')
+           open(7,file=trim(diag_cld_file),form='unformatted',status='unknown',position='rewind')
 
         else
            !  open(7,file=trim(diag_conv_file),form='unformatted',status='old',position='append')
@@ -472,9 +477,31 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
              call perr(myname,'         diag_conv_file =',trim(diag_conv_file))
              call  die(myname)
            endif
+
+           ! repeat for cloud diag file
+           inquire(unit=17,opened=opened)
+           if(opened) then
+             inquire(unit=17,name=tmpname,form=tmpform,access=tmpaccess)
+             tmpname=basename(tmpname)
+             if(trim(tmpname)/=trim(diag_cld_file)) then
+               call perr(myname,'unexpectly occupied, unit =',17)
+               call perr(myname,'           diag_cld_file =',trim(diag_cld_file))
+               call perr(myname,'   inquire(unit=17,  name= )',trim(tmpname))
+               call perr(myname,'   inquire(unit=17,  form= )',trim(tmpform))
+               call perr(myname,'   inquire(unit=17,access= )',trim(tmpaccess))
+               call  die(myname)
+             endif
+
+           else
+             call perr(myname,'unexpectly closed, unit =',17)
+             call perr(myname,'         diag_cld_file =',trim(diag_cld_file))
+             call  die(myname)
+           endif
+
         endif
         idate=iadate(4)+iadate(3)*100+iadate(2)*10000+iadate(1)*1000000
         if(init_pass .and. mype == 0)write(7)idate
+        if(init_pass .and. mype == 0)write(17)idate
      end if
 
      if (newpc4pred) then
@@ -740,6 +767,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
   ! -- call genstats_gps(bwork,awork(1,i_gps),toss_gps_sub,conv_diagsave,mype)
 
   if (conv_diagsave.and.binary_diag) close(7)
+  if (conv_diagsave.and.binary_diag) close(17)
   if (light_diagsave) close(55)
 
   if(.not.(l_PBL_pseudo_SurfobsT  .or.  l_PBL_pseudo_SurfobsQ   .or. &
