@@ -136,6 +136,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
 !====================================================================
 !  Begin
 !
+   write(6,*) 'cloudCover_Surface', mype, i_cloud_q_innovation
 !  set constant names consistent with original RUC code
 !
    vis2qc=-9999.0_r_single
@@ -167,7 +168,11 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
 
         ! cloud clearing obs
         if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
-            cld_cover_obs=0.0_r_single
+           do k=3,nsig,5
+              if (h_bk(k) < zlev_clr) then
+                 cld_cover_obs(k)=0.0_r_single
+              endif
+           enddo
         endif
 
 ! -- Now consider non-clear obs
@@ -217,11 +222,11 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
                           !double check logic for following if statement
                           if((cl_base_ista >= 1.0_r_kind .and. (firstcloud==0 .or. abs(zdiff)<cloud_dz)) .or. &
                              (cl_base_ista < 1.0_r_kind  .and. (abs(zdiff)<cloud_dz)) ) then
-                           !limit cloud building to below a specified height 
+                             !limit cloud building to below a specified height 
                              if (h_bk(k) < cld_bld_hgt) then 
                                if(ocld(ic) == 1 ) then
                                   pcp_type_obs(k)=0
-                               elseif (ocld(ic) == 2 ) then
+                               !elseif (ocld(ic) == 2 ) then
                                elseif (ocld(ic) == 3 ) then
                                   cld_cover_obs(k)=max(cld_cover_obs(k),0.7_r_single)
                                   if(cl_base_broken_k < 0 ) cl_base_broken_k=k
@@ -245,22 +250,16 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
                              firstcloud = firstcloud + 1
                           endif  ! zdiff < cloud_dz
                           endif ! i_cloud_q_innovation=20or21
-                       else
-                          !clear up to cloud base of first cloud level
-                          if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
-                             if (ic==1) cld_cover_obs(k)=0.0_r_single
-                             if (ocld(ic) == 1) pcp_type_obs(k)=0
-                             if (ocld(ic) == 3 .or. ocld(ic) == 4) then
-                                if (wthr_type > 10 .and. wthr_type < 20 .or. wthr_type == 1 ) then
-                                   pcp_type_obs(k)=1
-                                endif
-                             endif
-                          endif
                        endif  ! zdiff<underlim
                     endif ! firstcloud
                  enddo  ! end K loop
+              endif  ! end if ocld valid
 
-              endif     ! end if ocld valid
+              ! after cloud base is found, clear below
+              !if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
+              !   if(kcld>= 7) cld_cover_obs(3)=0.0_r_single
+              !endif
+
            endif  ! obused
         enddo      ! end IC loop
      endif      ! end if cloudy ob  
