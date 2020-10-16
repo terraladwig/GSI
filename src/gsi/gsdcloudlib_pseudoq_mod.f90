@@ -136,7 +136,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
 !====================================================================
 !  Begin
 !
-   write(6,*) 'cloudCover_Surface', mype, i_cloud_q_innovation
+   !write(6,*) 'cloudCover_Surface', mype, i_cloud_q_innovation
 !  set constant names consistent with original RUC code
 !
    vis2qc=-9999.0_r_single
@@ -226,7 +226,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
                              if (h_bk(k) < cld_bld_hgt) then 
                                if(ocld(ic) == 1 ) then
                                   pcp_type_obs(k)=0
-                               !elseif (ocld(ic) == 2 ) then
+                               elseif (ocld(ic) == 2 ) then
                                elseif (ocld(ic) == 3 ) then
                                   cld_cover_obs(k)=max(cld_cover_obs(k),0.7_r_single)
                                   if(cl_base_broken_k < 0 ) cl_base_broken_k=k
