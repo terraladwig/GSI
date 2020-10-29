@@ -127,7 +127,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
   INTEGER(i_kind) :: k
   INTEGER(i_kind) :: ic
   integer(i_kind) :: firstcloud,cl_base_broken_k,obused
-  integer(i_kind) :: kcld
+  integer(i_kind) :: kcld,kclr
   real(r_single)  ::    underlim
   REAL(r_kind) :: zdiff
   REAL(r_kind) :: zlev_clr,cloud_dz,cl_base_ista,betav
@@ -144,6 +144,7 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
    firstcloud = 0
    obused =0
    kcld=-9
+   kclr=99
 !
 !*****************************************************************
 !  analysis of surface/METAR cloud observations
@@ -255,10 +256,11 @@ SUBROUTINE cloudCover_Surface_col(mype,nsig, &
                  enddo  ! end K loop
               endif  ! end if ocld valid
 
-              ! after cloud base is found, clear below
-              !if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
-              !   if(kcld>= 7) cld_cover_obs(3)=0.0_r_single
-              !endif
+              ! after cloud base is found, clear ~half way below
+              if(i_cloud_q_innovation==20 .or. i_cloud_q_innovation==22) then
+                 kclr=kcld/2
+                 if(kclr>= 3) cld_cover_obs(kclr)=0.0_r_single
+              endif
 
            endif  ! obused
         enddo      ! end IC loop
