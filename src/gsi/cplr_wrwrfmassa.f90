@@ -1860,8 +1860,8 @@ contains
     real(r_kind),allocatable::tmp2da(:,:),tmp2db(:,:),tmp2dc(:,:)
     character(6) filename
     integer(i_kind) i,j,k,kt,kq,ku,kv,it,i_psfc,i_t,i_q,i_u,i_v,i_w,i_dbz,ij
-    integer(i_kind) i_qc,i_qi,i_qr,i_qs,i_qg,i_qnr,i_qni,i_qnc
-    integer(i_kind) kqc,kqi,kqr,kqs,kqg,kqnr,kqni,kqnc,i_tt,ktt,kw,kdbz
+    integer(i_kind) i_qc,i_qi,i_qr,i_qs,i_qg,i_qnr,i_qni,i_qnc,i_fra
+    integer(i_kind) kqc,kqi,kqr,kqs,kqg,kqnr,kqni,kqnc,kfra,i_tt,ktt,kw,kdbz
     integer(i_kind) i_sst,i_skt,i_th2,i_q2,i_soilt1,i_tslb,i_smois,ktslb,ksmois
     integer(i_kind) :: iv, n_gocart_var,i_snowT_check
     integer(i_kind),allocatable :: i_chem(:), kchem(:)
@@ -1896,6 +1896,7 @@ contains
     real(r_kind), pointer :: ges_qnr(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_qni(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_qnc(:,:,:)=>NULL()
+    real(r_kind), pointer :: ges_fra(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_dbz(:,:,:)=>NULL()
   
     real(r_kind), pointer :: ges_sulf (:,:,:)=>NULL()
@@ -1932,6 +1933,7 @@ contains
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnr',ges_qnr,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qni',ges_qni,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnc',ges_qnc,istatus );ier=ier+istatus
+       call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'fra',ges_fra,istatus );ier=ier+istatus
        if (ier/=0) n_actual_clouds=0
     end if
   
@@ -1941,8 +1943,8 @@ contains
   
     num_mass_fields_base=2+4*lm + 1
     num_mass_fields=num_mass_fields_base
-!    The 9 3D cloud analysis fields are: ql,qi,qr,qs,qg,qnr,qni,qnc,tt
-    if(l_hydrometeor_bkio .and. n_actual_clouds>0) num_mass_fields=num_mass_fields + 9*lm
+!    The 10 3D cloud analysis fields are: ql,qi,qr,qs,qg,qnr,qni,qnc,tt
+    if(l_hydrometeor_bkio .and. n_actual_clouds>0) num_mass_fields=num_mass_fields + 10*lm
     if(l_gsd_soilTQ_nudge) num_mass_fields=num_mass_fields+2*nsig_soil+1
     if(i_use_2mt4b > 0 ) num_mass_fields=num_mass_fields+2
     if(i_use_2mt4b <= 0 .and. i_use_2mq4b > 0) num_mass_fields=num_mass_fields+1
@@ -2015,11 +2017,12 @@ contains
        i_qnr=i_qg+lm
        i_qni=i_qnr+lm
        i_qnc=i_qni+lm
+       i_fra=i_qnc+lm
        if(dbz_exist.and.if_model_dbz)then
-         i_dbz=i_qnc+lm
+         i_dbz=i_fra+lm
          i_tt=i_dbz+lm
        else
-         i_tt=i_qnc+lm
+         i_tt=i_fra+lm
        end if
        if ( laeroana_gocart ) then
           do iv = 1, n_gocart_var
@@ -2077,6 +2080,7 @@ contains
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnr',ges_qnr,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qni',ges_qni,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnc',ges_qnc,istatus );ier=ier+istatus
+       call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'fra',ges_fra,istatus );ier=ier+istatus
        if(dbz_exist) &
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'dbz',ges_dbz,istatus );ier=ier+istatus
        if (ier/=0) then
@@ -2116,6 +2120,7 @@ contains
        kqnr=i_qnr-1
        kqni=i_qni-1
        kqnc=i_qnc-1
+       kfra=i_fra-1
        if(dbz_exist.and.if_model_dbz)kdbz=i_dbz-1
        ktt=i_tt-1
     endif
@@ -2175,6 +2180,7 @@ contains
           kqnr=kqnr+1
           kqni=kqni+1
           kqnc=kqnc+1
+          kfra=kfra+1
           if(dbz_exist.and.if_model_dbz)kdbz=kdbz+1
           ktt=ktt+1
        endif
@@ -2213,6 +2219,7 @@ contains
                 all_loc(j,i,kqnr)=ges_qnr(j,i,k)
                 all_loc(j,i,kqni)=ges_qni(j,i,k)
                 all_loc(j,i,kqnc)=ges_qnc(j,i,k)
+                all_loc(j,i,kfra)=ges_fra(j,i,k)
                 if(dbz_exist.and.if_model_dbz)all_loc(j,i,kdbz)=ges_dbz(j,i,k)
                 all_loc(j,i,ktt)=ges_tten(j,i,k,it)
              endif
@@ -2869,7 +2876,17 @@ contains
              write(lendian_out)temp1
           end if
        end do
-   
+
+  ! Update fra
+       kfra=i_fra-1
+       do k=1,nsig
+          kfra=kfra+1
+          if(mype == 0) read(lendian_in)temp1
+          if(mype == 0) then
+             write (lendian_out)temp1
+          end if
+       end do
+
        if(dbz_exist.and.if_model_dbz)then
        ! Update refl_10cm
             kdbz=i_dbz-1

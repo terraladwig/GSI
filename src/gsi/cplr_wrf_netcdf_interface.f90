@@ -123,7 +123,7 @@ contains
     associate( this => this ) ! eliminates warning for unused dummy argument needed for binding
     end associate
     
-    print_verbose=.false.
+    print_verbose=.true.
     if(verbose) print_verbose=.true.
     wrf_real=104
     end_index=0
@@ -1197,6 +1197,29 @@ contains
                 write(6,*)' k,max,min,mid Qnc=',k,maxval(field3(:,:,k)),minval(field3(:,:,k)), &
                       field3(nlon_regional/2,nlat_regional/2,k)
              write(iunit)((field3(i,j,k),i=1,nlon_regional),j=1,nlat_regional) ! Qnc
+          end do
+
+          rmse_var='CLDFRA_BL'
+          call ext_ncd_get_var_info (dh1,trim(rmse_var),ndim1,ordering,staggering,    &
+               start_index,end_index, WrfType, ierr    )
+          if(print_verbose)then
+             write(6,*)' rmse_var = ',trim(rmse_var),' ndim1=',ndim1
+             write(6,*)' WrfType = ',WrfType,' WRF_REAL=',WRF_REAL,'ierr  = ',ierr
+             write(6,*)' ordering = ',trim(ordering),' staggering = ',trim(staggering)
+             write(6,*)' start_index = ',start_index,' end_index = ',end_index
+          end if
+          call ext_ncd_read_field(dh1,DateStr1,TRIM(rmse_var),              &
+               field3,WRF_REAL,0,0,0,ordering,           &
+               staggering, dimnames ,               &
+               start_index,end_index,               & !dom
+               start_index,end_index,               & !mem
+               start_index,end_index,               & !pat
+               ierr                                 )
+          do k=1,nsig_regional
+             if(print_verbose) &
+                write(6,*)' k,max,min,mid CLDFRA_BL=',k,maxval(field3(:,:,k)),minval(field3(:,:,k)), &
+                      field3(nlon_regional/2,nlat_regional/2,k)
+             write(iunit)((field3(i,j,k),i=1,nlon_regional),j=1,nlat_regional) ! CLDFRA_BL
           end do
 
           if( dbz_exist .and. if_model_dbz ) then
@@ -2474,6 +2497,7 @@ contains
     real(r_kind), pointer :: ges_qnr(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_qni(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_qnc(:,:,:)=>NULL()
+    real(r_kind), pointer :: ges_fra(:,:,:)=>NULL()
     real(r_kind), pointer :: ges_dbz(:,:,:)=>NULL()
   ! binary stuff
     logical print_verbose
@@ -2516,6 +2540,7 @@ contains
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnr',ges_qnr,istatus );ierr=ierr+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qni',ges_qni,istatus );ierr=ierr+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnc',ges_qnc,istatus );ierr=ierr+istatus
+       call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'fra',ges_fra,istatus );ierr=ierr+istatus
        if(dbz_exist) call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it),'dbz',ges_dbz,istatus );ierr=ierr+istatus
        if (ierr/=0) n_actual_clouds=0
     end if
@@ -3187,6 +3212,33 @@ contains
               field3(nlon_regional/2,nlat_regional/2,k)
       end do
       rmse_var='QNCLOUD'
+      call ext_ncd_get_var_info (dh1,trim(rmse_var),ndim1,ordering,staggering, &
+           start_index,end_index1, WrfType, ierr    )
+      if(print_verbose)then
+         write(6,*)' rmse_var=',trim(rmse_var)
+         write(6,*)' ordering=',ordering
+         write(6,*)' WrfType,WRF_REAL=',WrfType,WRF_REAL
+         write(6,*)' ndim1=',ndim1
+         write(6,*)' staggering=',staggering
+         write(6,*)' start_index=',start_index
+         write(6,*)' end_index1=',end_index1
+      end if
+      where (field3 < tiny_single) field3 = tiny_single
+      call ext_ncd_write_field(dh1,DateStr1,TRIM(rmse_var),              &
+           field3,WRF_REAL,0,0,0,ordering,           &
+           staggering, dimnames ,               &
+           start_index,end_index1,               & !dom
+           start_index,end_index1,               & !mem
+           start_index,end_index1,               & !pat
+           ierr                                 )
+
+      do k=1,nsig_regional
+         read(iunit)((field3(i,j,k),i=1,nlon_regional),j=1,nlat_regional) ! CLDFRA_BL
+         if(print_verbose) &
+            write(6,*)' k,max,min,mid CLDFRA_BL=',k,maxval(field3(:,:,k)),minval(field3(:,:,k)), &
+              field3(nlon_regional/2,nlat_regional/2,k)
+      end do
+      rmse_var='CLDFRA_BL'
       call ext_ncd_get_var_info (dh1,trim(rmse_var),ndim1,ordering,staggering, &
            start_index,end_index1, WrfType, ierr    )
       if(print_verbose)then

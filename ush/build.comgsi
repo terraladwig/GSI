@@ -11,6 +11,8 @@
 #    make -j8
 #
 
+set -x
+
 dir_root=$(pwd)
 
 ################# Hera ####################
@@ -39,10 +41,16 @@ elif [[ -d /glade ]] ; then
 
 ################# Orion ####################
 elif [[ -d /work/noaa ]] ; then  ### orion
-    modulefile="/home/gge/modulefiles/modulefile.orion.GSI_UPP_WRF"
+    modulefile="/work/noaa/wrfruc/mhu/rapcode/gsi/com/GSI/ush/modulefile.orion.GSI_UPP_WRF"
     NCEPLIBS="/work/noaa/wrfruc/gge/precompiled/NCEPLIBS/b_intel2018.4_impi2018.4/install"
     GSILIBS="/work/noaa/wrfruc/gge/precompiled/GSILIBS/b_intel2018.4_impi2018.4"
-
+#     source /home/gge/modulefiles/module.sh
+#     module purge
+#     module load intel/2018.4
+#     module load impi/2018.4
+#     module load mkl/2018.4
+#     module load netcdf/4.7.2
+#
 ################# Generic ####################
 else
     echo -e "\nunknown machine"
@@ -68,9 +76,8 @@ if [[ "$NETCDF4" == "1" ]] || [[ "$NETCDF4" == "0" ]]; then
 fi
 
 export BACIO_LIB4=${NCEPLIBS}/lib/libbacio_4.a
-#export  BUFR_LIBd=${NCEPLIBS}/lib/libbufr_d.a
-  export  BUFR_LIBd=${GSILIBS}/lib/libbufr_v.a
-  export GSIWRF_LIB=${GSILIBS}/lib/libWRFLIB.a
+export  BUFR_LIBd=${GSILIBS}/lib/libbufr_v.a
+export GSIWRF_LIB=${GSILIBS}/lib/libWRFLIB.a
 export   CRTM_LIB=${NCEPLIBS}/lib/libcrtm.a
 export   CRTM_INC=${NCEPLIBS}/include
 export NEMSIO_LIB=${NCEPLIBS}/lib/libnemsio.a
