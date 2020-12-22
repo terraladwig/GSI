@@ -537,6 +537,8 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
                            ddiff=qv_ob-q_bk(k)
                            q_build0_count=q_build0_count+1
                        endif
+                       ! build error = 50%
+                       error=one/(cloudqvis*5.E-01_r_kind)
        
                    elseif (qob > -0.000001_r_single) then
                        
@@ -549,13 +551,16 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
                            ddiff=qv_ob-q_bk(k) 
                            q_clear0_count=q_clear0_count+1
                        endif
+                       ! clear error = 30%
+                       error=one/(cloudqvis*3.E-01_r_kind)
                    else
                        cycle
                    endif
        
                    q_obcount=q_obcount+1
        
-                   error=one/(cloudqvis*3.E-01_r_kind)
+                   ! all obs errors = 30%
+                   !error=one/(cloudqvis*3.E-01_r_kind)
                    ratio_errors=1.0_r_kind
                    val = error*ddiff
        
