@@ -706,7 +706,7 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
      endif
   endif
 
-  is = 77
+  is = 81
   ! Release memory of local guess arrays
   call final_vars_
 
