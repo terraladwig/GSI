@@ -179,6 +179,8 @@ module rapidrefresh_cldsurf_mod
 !                          = 2(clean Qg as in 1, and adjustment to the retrieved Qr/Qs/Qnr throughout the whole profile)
 !                          = 3(similar to 2, but adjustment to Qr/Qs/Qnr only below maximum reflectivity level
 !                           and where the dbz_obs is missing);
+!      i_cloudfrac_opts  - integer to choose if and how to use cloud fraction
+!                           =0 don't use cloud fraction
 !
 ! attributes:
 !   language: f90
@@ -250,6 +252,7 @@ module rapidrefresh_cldsurf_mod
   public :: l_saturate_bkCloud
   public :: l_rtma3d
   public :: i_precip_vertical_check
+  public :: i_cloudfrac_opts
 
   logical l_hydrometeor_bkio
   real(r_kind)  dfi_radar_latent_heat_time_period
@@ -308,6 +311,7 @@ module rapidrefresh_cldsurf_mod
   logical              l_saturate_bkCloud
   logical              l_rtma3d
   integer(i_kind)      i_precip_vertical_check
+  integer(i_kind)      i_cloudfrac_opts
 
 contains
 
@@ -416,6 +420,7 @@ contains
     l_saturate_bkCloud= .true.
     l_rtma3d            = .false.                     ! turn configuration for rtma3d off          
     i_precip_vertical_check = 0                       ! No check and adjustment to retrieved Qr/Qs/Qg (default)
+    i_cloudfrac_opts = 0                              ! 0 = don't use cloud fraction 
 
     return
   end subroutine init_rapidrefresh_cldsurf
