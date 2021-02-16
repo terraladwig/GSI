@@ -537,8 +537,8 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
                            ddiff=qv_ob-q_bk(k)
                            q_build0_count=q_build0_count+1
                        endif
-                       ! build error = 50%
-                       error=one/(cloudqvis*10.E-01_r_kind)
+                       ! build error = 80%
+                       error=one/(cloudqvis*8.E-01_r_kind)
        
                    elseif (qob > -0.000001_r_single) then
                        
