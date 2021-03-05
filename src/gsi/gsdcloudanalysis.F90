@@ -240,7 +240,7 @@ subroutine  gsdcloudanalysis(mype)
   real(r_kind), pointer :: ges_qnr(:,:,:)=>NULL() ! rain number concentration
   real(r_kind), pointer :: ges_qni(:,:,:)=>NULL() ! cloud ice number concentration
   real(r_kind), pointer :: ges_qnc(:,:,:)=>NULL() ! cloud water number concentration
-  real(r_kind), pointer :: ges_fra(:,:,:)=>NULL() ! subgrid cloud fraction
+  !real(r_kind), pointer :: ges_fra(:,:,:)=>NULL() ! subgrid cloud fraction
 !
 !  misc.
 !
@@ -298,7 +298,7 @@ subroutine  gsdcloudanalysis(mype)
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnr',ges_qnr,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qni',ges_qni,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnc',ges_qnc,istatus);ier=ier+istatus
-  call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'fra',ges_fra,istatus);ier=ier+istatus
+  !call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'fra',ges_fra,istatus);ier=ier+istatus
   if(ier/=0) return ! no guess, nothing to do
 
   !if(mype==0) then
@@ -846,7 +846,8 @@ subroutine  gsdcloudanalysis(mype)
               nwater_3d(i,j,k)   = zero
               clean_count        = clean_count+1
            ! build cloud
-           elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind .and. ges_fra(j,i,k) < 0.45_r_kind  ) then      
+           !elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind .and. ges_fra(j,i,k) < 0.45_r_kind  ) then      
+           elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind ) then      
               cloudwater         =0.001_r_kind*cldwater_3d(i,j,k)
               cloudice           =0.001_r_kind*cldice_3d(i,j,k)
               cldwater_3d(i,j,k) = max(cloudwater,ges_ql(j,i,k))
