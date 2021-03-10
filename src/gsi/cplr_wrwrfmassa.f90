@@ -1922,7 +1922,6 @@ contains
   
   ! Inquire about cloud guess fields
     call gsi_metguess_get('clouds::3d',n_actual_clouds,istatus)
-    write(*,*) "TERRA 0", n_actual_clouds
     if (n_actual_clouds>0) then
   !    get pointer to relevant instance of cloud-related backgroud
        ier=0
@@ -1934,9 +1933,7 @@ contains
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnr',ges_qnr,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qni',ges_qni,istatus );ier=ier+istatus
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'qnc',ges_qnc,istatus );ier=ier+istatus
-       write(*,*) "TERRA ier0", ier
        call GSI_BundleGetPointer ( GSI_MetGuess_Bundle(it), 'fra',ges_fra,istatus );ier=ier+istatus
-       write(*,*) "TERRA ier1", ier
        if (ier/=0) n_actual_clouds=0
     end if
   
@@ -1947,7 +1944,6 @@ contains
     num_mass_fields_base=2+4*lm + 1
     num_mass_fields=num_mass_fields_base
 !    The 10 3D cloud analysis fields are: ql,qi,qr,qs,qg,qnr,qni,qnc,tt
-    ! if frac is off above should then 10 below be 9?
     if(l_hydrometeor_bkio .and. n_actual_clouds>0) num_mass_fields=num_mass_fields + 10*lm
     write(*,*) "TERRA ", l_hydrometeor_bkio, n_actual_clouds, num_mass_fields
     if(l_gsd_soilTQ_nudge) num_mass_fields=num_mass_fields+2*nsig_soil+1

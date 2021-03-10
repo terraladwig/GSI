@@ -240,7 +240,7 @@ subroutine  gsdcloudanalysis(mype)
   real(r_kind), pointer :: ges_qnr(:,:,:)=>NULL() ! rain number concentration
   real(r_kind), pointer :: ges_qni(:,:,:)=>NULL() ! cloud ice number concentration
   real(r_kind), pointer :: ges_qnc(:,:,:)=>NULL() ! cloud water number concentration
-  !real(r_kind), pointer :: ges_fra(:,:,:)=>NULL() ! subgrid cloud fraction
+  real(r_kind), pointer :: ges_fra(:,:,:)=>NULL() ! subgrid cloud fraction
 !
 !  misc.
 !
@@ -298,7 +298,7 @@ subroutine  gsdcloudanalysis(mype)
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnr',ges_qnr,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qni',ges_qni,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnc',ges_qnc,istatus);ier=ier+istatus
-  !call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'fra',ges_fra,istatus);ier=ier+istatus
+  call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'fra',ges_fra,istatus);ier=ier+istatus
   if(ier/=0) return ! no guess, nothing to do
 
   !if(mype==0) then
@@ -596,7 +596,6 @@ subroutine  gsdcloudanalysis(mype)
 !
   if( (istat_radar + istat_surface + istat_nesdis + istat_lightning ) == 0 ) then
      write(6,*) ' No cloud observations available, return', mype
-!     ges_qg=ges_fra
      deallocate(ref_mos_3d,ref_mos_3d_tten,lightning,sat_ctp,sat_tem,w_frac,nlev_cld)
      return
   endif
@@ -1297,7 +1296,6 @@ subroutine  gsdcloudanalysis(mype)
            ges_qr(j,i,k)=rain_3d(i,j,k)
            ges_qs(j,i,k)=snow_3d(i,j,k)
            ges_qg(j,i,k)=graupel_3d(i,j,k)
-!           ges_qg(j,i,k)=ges_fra(j,i,k)
            ges_ql(j,i,k)=cldwater_3d(i,j,k)
            ges_qi(j,i,k)=cldice_3d(i,j,k)
            ges_qnr(j,i,k)=nrain_3d(i,j,k)

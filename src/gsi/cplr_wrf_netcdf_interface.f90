@@ -3016,7 +3016,6 @@ contains
     endif
   
     if (l_hydrometeor_bkio .and. n_actual_clouds>0) then
-      write(6,*)' Terra hydrometeor', l_hydrometeor_bkio
       do k=1,nsig_regional
          read(iunit)((field3(i,j,k),i=1,nlon_regional),j=1,nlat_regional)   !  Qc
          if(print_verbose) &
@@ -3197,7 +3196,6 @@ contains
          write(6,*)' start_index=',start_index
          write(6,*)' end_index1=',end_index1
       end if
-      write(6,*)' Terra QNICE'
       where (field3 < tiny_single) field3 = tiny_single
       call ext_ncd_write_field(dh1,DateStr1,TRIM(rmse_var),              &
            field3,WRF_REAL,0,0,0,ordering,           &
@@ -3225,7 +3223,6 @@ contains
          write(6,*)' start_index=',start_index
          write(6,*)' end_index1=',end_index1
       end if
-      write(6,*)' Terra QNCLOUD'
       where (field3 < tiny_single) field3 = tiny_single
       call ext_ncd_write_field(dh1,DateStr1,TRIM(rmse_var),              &
            field3,WRF_REAL,0,0,0,ordering,           &
@@ -3253,9 +3250,7 @@ contains
          write(6,*)' start_index=',start_index
          write(6,*)' end_index1=',end_index1
       end if
-      write(6,*)' Terra before where'
       where (field3 < tiny_single) field3 = tiny_single
-      write(6,*)' Terra before write'
       call ext_ncd_write_field(dh1,DateStr1,TRIM(rmse_var),              &
            field3,WRF_REAL,0,0,0,ordering,           &
            staggering, dimnames ,               &
@@ -3263,7 +3258,6 @@ contains
            start_index,end_index1,               & !mem
            start_index,end_index1,               & !pat
            ierr                                 )
-      write(6,*)' Terra after'
     end if ! l_hydrometeor_bkio
     
     if(dbz_exist .and. if_model_dbz)then
