@@ -166,7 +166,7 @@
                             cld_bld_coverage,cld_clr_coverage,&
                             i_cloud_q_innovation,i_ens_mean,DTsTmax,&
                             i_T_Q_adjust,l_saturate_bkCloud,l_rtma3d,i_precip_vertical_check,&
-                            i_cloudfrac
+                            i_cloudfrac,r_cloudfrac_threshold
   use gsi_metguess_mod, only: gsi_metguess_init,gsi_metguess_final
   use gsi_chemguess_mod, only: gsi_chemguess_init,gsi_chemguess_final
   use tcv_mod, only: init_tcps_errvals,tcp_refps,tcp_width,tcp_ermin,tcp_ermax
@@ -1217,8 +1217,14 @@
 !                           = 2(clean Qg as in 1, and adjustment to the retrieved Qr/Qs/Qnr throughout the whole profile)
 !                           = 3(similar to 2, but adjustment to Qr/Qs/Qnr only below maximum reflectivity level
 !                             and where the dbz_obs is missing);
-!      i_cloudfrac  - integer to choose if and how to use cloud fraction
-!                           =0 don't use cloud fraction
+!      i_cloudfrac    - integer to choose if and how to use cloud fraction
+!                           = 0  clr and bld for mostly cloudy, don't use cloud fraction
+!                           = 1  clr and bld for mostly cloudy, use cloud fraction
+!                           = 2  clr for partly cloudy, bld for mostly cloudy, don't use cloud fraction
+!                           = 12 clr for partly cloudy, bld for mostly cloudy, use cloud fraction
+!                           = 3  clr for partly cloudy, bld for mostly cloudy, use cloud fraction
+!      r_cloudfrac_threshold  - real, threshold of 1st guess cloud to do cloud building
+!                           = 0.45 default
 !
   namelist/rapidrefresh_cldsurf/dfi_radar_latent_heat_time_period, &
                                 metar_impact_radius,metar_impact_radius_lowcloud, &
@@ -1240,7 +1246,7 @@
                                 cld_bld_coverage,cld_clr_coverage,&
                                 i_cloud_q_innovation,i_ens_mean,DTsTmax, &
                                 i_T_Q_adjust,l_saturate_bkCloud,l_rtma3d,i_precip_vertical_check,&
-                                i_cloudfrac
+                                i_cloudfrac,r_cloudfrac_threshold
 
 ! chem(options for gsi chem analysis) :
 !     berror_chem       - .true. when background  for chemical species that require
