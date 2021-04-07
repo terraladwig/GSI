@@ -111,6 +111,7 @@ subroutine  gsdcloudanalysis(mype)
   real(r_single),allocatable:: ps_bk(:,:)
   real(r_single),allocatable:: zh(:,:)
   real(r_single),allocatable:: q_bk(:,:,:)
+  real(r_single),allocatable:: cldfrabk(:,:,:)
 
   real(r_single),allocatable:: xlon(:,:)        ! 2D longitude in each grid
   real(r_single),allocatable:: xlat(:,:)        ! 2D latitude in each grid
@@ -257,7 +258,7 @@ subroutine  gsdcloudanalysis(mype)
   character(10)   :: obstype
   integer(i_kind) :: lunin, is, ier, istatus
   integer(i_kind) :: nreal,nchanl,ilat1s,ilon1s
-  integer(i_kind) :: clean_count,build_count,part_count,miss_count
+  integer(i_kind) :: clean_count,few_build_count,build_count,part_count,miss_count
   character(20)   :: isis
 
   real(r_kind)    :: refmax,snowtemp,raintemp,nraintemp,graupeltemp
@@ -278,6 +279,7 @@ subroutine  gsdcloudanalysis(mype)
 !
 !
   clean_count=0
+  few_build_count=0
   build_count=0
   part_count=0
   miss_count=0
@@ -615,6 +617,7 @@ subroutine  gsdcloudanalysis(mype)
   allocate(ps_bk(lon2,lat2))
   allocate(zh(lon2,lat2))
   allocate(q_bk(lon2,lat2,nsig))
+  allocate(cldfrabk(lon2,lat2,nsig))
   
   allocate(xlon(lon2,lat2))
   allocate(xlat(lon2,lat2))
@@ -670,6 +673,7 @@ subroutine  gsdcloudanalysis(mype)
            qmixr = q_bk(i,j,k)/(one - q_bk(i,j,k))     ! covert from specific humidity to mixing ratio
            t_bk(i,j,k)=ges_tv(j,i,k)/                                  &
                      (one+fv*q_bk(i,j,k))   ! virtual temp to temp
+           cldfrabk(i,j,k)=ges_fra(i,j,k)
         enddo
      enddo
   enddo
@@ -862,7 +866,7 @@ subroutine  gsdcloudanalysis(mype)
               else
                  nice_3d(i,j,k) = ges_qni(j,i,k)
               endif
-              build_count=build_count+1
+              few_build_count=few_build_count+1
            ! build heavy cloud areas
            elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
               cloudwater         =0.001_r_kind*cldwater_3d(i,j,k)
@@ -1235,8 +1239,8 @@ subroutine  gsdcloudanalysis(mype)
 !  endif
 !
 !
-  call cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,  &
-                 lat2,lon2,nsig,q_bk,t_bk,p_bk,      &
+  call cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_cloudfrac_threshold, &
+                 lat2,lon2,nsig,q_bk,t_bk,p_bk,cldfrabk,      &
                  cld_cover_3d,wthr_type_2d,cldwater_3d,cldice_3d,sumqci,qv_max_inc, l_saturate_bkCloud)
 
 
@@ -1333,7 +1337,7 @@ subroutine  gsdcloudanalysis(mype)
   deallocate(cld_cover_3d,cld_type_3d,wthr_type_2d, &
              pcp_type_3d,cloudlayers_i)
   deallocate(t_bk,h_bk,p_bk,ps_bk,zh,q_bk,sumqci,pblh)
-  deallocate(xlon,xlat,xland,soiltbk)
+  deallocate(xlon,xlat,xland,soiltbk,cldfrabk)
   deallocate(cldwater_3d,cldice_3d,rain_3d,nrain_3d,snow_3d,graupel_3d,cldtmp_3d)
   deallocate(nice_3d,nwater_3d)
   deallocate(vis2qc)
@@ -1349,7 +1353,7 @@ subroutine  gsdcloudanalysis(mype)
   deallocate(sat_ctp,sat_tem,w_frac,nlev_cld)
   deallocate(ref_mos_3d,ref_mos_3d_tten,lightning)
 
-  write(*,*) "CLDcount", clean_count,build_count,part_count,miss_count
+  write(*,*) "CLDcount", clean_count,few_build_count,build_count,part_count,miss_count
   if(mype==0) then
      write(6,*) '========================================'
      write(6,*) 'gsdcloudanalysis: generalized cloud analysis finished:',mype

@@ -1945,7 +1945,6 @@ contains
     num_mass_fields=num_mass_fields_base
 !    The 10 3D cloud analysis fields are: ql,qi,qr,qs,qg,qnr,qni,qnc,tt
     if(l_hydrometeor_bkio .and. n_actual_clouds>0) num_mass_fields=num_mass_fields + 10*lm
-    write(*,*) "TERRA ", l_hydrometeor_bkio, n_actual_clouds, num_mass_fields
     if(l_gsd_soilTQ_nudge) num_mass_fields=num_mass_fields+2*nsig_soil+1
     if(i_use_2mt4b > 0 ) num_mass_fields=num_mass_fields+2
     if(i_use_2mt4b <= 0 .and. i_use_2mq4b > 0) num_mass_fields=num_mass_fields+1
