@@ -152,7 +152,7 @@ module rapidrefresh_cldsurf_mod
 !      cld_bld_coverage  - namelist real for cloud coverage required for qc/qi building
 !                             (default = 0.6)
 !      cld_clr_coverage  - namelist real for cloud coverage required for qc/qi clearing
-!                             (default = 0.4)
+!                             (default = 0.6)
 !      i_cloud_q_innovation - integer to choose if and how cloud obs are used
 !                           0= no innovations 
 !                           1= cloud total innovations
