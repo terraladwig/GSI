@@ -507,7 +507,7 @@ subroutine setupcldtot(lunin,mype,bwork,awork,nele,nobs,is,conv_diagsave)
    
 !!!!!Warning you hard coded q values here
                    ibin = 1 ! q ob bin
-                   is = 4   ! q ob type number, these come from list in gsiparm
+                   is = 3   ! q ob type number, these come from list in gsiparm
        
                    allocate(my_headq)
                    m_alloc(ibin) = m_alloc(ibin) +1
