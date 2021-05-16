@@ -850,23 +850,23 @@ subroutine  gsdcloudanalysis(mype)
               nwater_3d(i,j,k)   = zero
               clean_count        = clean_count+1
            ! build in moderate cloud areas - use half the cloud build for heavy cloud
-           elseif( cld_cover_3d(i,j,k) > cld_clr_coverage .and. cld_cover_3d(i,j,k) <= cld_bld_coverage .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
-              cloudwater         = 0.5 * 0.001_r_kind*cldwater_3d(i,j,k)
-              cloudice           = 0.5 * 0.001_r_kind*cldice_3d(i,j,k)
-              cldwater_3d(i,j,k) = max(cloudwater,ges_ql(j,i,k))
-              cldice_3d(i,j,k)   = max(cloudice,ges_qi(j,i,k))
-              ! mhu: Feb2017: set qnc=1e8 and qni=1e6 when build cloud
-              if(cloudwater > 1.0e-7_r_kind .and. cloudwater >= ges_ql(j,i,k)) then
-                 nwater_3d(i,j,k) = 1.0E8_r_single
-              else
-                 nwater_3d(i,j,k) = ges_qnc(j,i,k)
-              endif
-              if(cloudice > 1.0e-7_r_kind .and. cloudice >= ges_qi(j,i,k)) then
-                 nice_3d(i,j,k) = 1.0E6_r_single
-              else
-                 nice_3d(i,j,k) = ges_qni(j,i,k)
-              endif
-              few_build_count=few_build_count+1
+           !elseif( cld_cover_3d(i,j,k) > cld_clr_coverage .and. cld_cover_3d(i,j,k) <= cld_bld_coverage .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
+           !   cloudwater         = 0.5 * 0.001_r_kind*cldwater_3d(i,j,k)
+           !   cloudice           = 0.5 * 0.001_r_kind*cldice_3d(i,j,k)
+           !   cldwater_3d(i,j,k) = max(cloudwater,ges_ql(j,i,k))
+           !   cldice_3d(i,j,k)   = max(cloudice,ges_qi(j,i,k))
+           !   ! mhu: Feb2017: set qnc=1e8 and qni=1e6 when build cloud
+           !   if(cloudwater > 1.0e-7_r_kind .and. cloudwater >= ges_ql(j,i,k)) then
+           !      nwater_3d(i,j,k) = 1.0E8_r_single
+           !   else
+           !      nwater_3d(i,j,k) = ges_qnc(j,i,k)
+           !   endif
+           !   if(cloudice > 1.0e-7_r_kind .and. cloudice >= ges_qi(j,i,k)) then
+           !      nice_3d(i,j,k) = 1.0E6_r_single
+           !   else
+           !      nice_3d(i,j,k) = ges_qni(j,i,k)
+           !   endif
+           !   few_build_count=few_build_count+1
            ! build heavy cloud areas
            elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
               cloudwater         =0.001_r_kind*cldwater_3d(i,j,k)
