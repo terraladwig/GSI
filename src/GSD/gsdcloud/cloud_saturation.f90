@@ -1,4 +1,5 @@
 SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_cloudfrac_threshold, &
+                 cld_bld_coverage, &
                  nlat,nlon,nsig,q_bk,t_bk,p_bk,cldfrabk, &
                  cld_cover_3d,wthr_type,  &
                  cldwater_3d,cldice_3d,sumqci,qv_max_inc)
@@ -33,6 +34,8 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_c
 !     wthr_type   - 3D weather type
 !     l_conserve_thetaV  - if .true. conserving thetaV
 !     i_conserve_thetaV_iternum - iteration number for conserving thetaV
+!     cld_bld_coverage - fraction of cloud coverage to active building behavior,
+!                      - default 0.6
 !
 !   output argument list:
 !     q_bk        - 3D moisture
@@ -63,6 +66,7 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_c
   logical,intent(in):: l_conserve_thetaV
   integer(i_kind),intent(in):: i_conserve_thetaV_iternum
   integer(r_single),intent(in):: r_cloudfrac_threshold 
+  integer(r_single),intent(in):: cld_bld_coverage
 !
 !  background
 !
@@ -167,8 +171,8 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_c
                  endif
             endif
             !C  - moisten layers above and below cloud layer
-            if(cld_cover_3d(i,j,k+1) > 0.6_r_kind .or.          &
-               cld_cover_3d(i,j,k-1) > 0.6_r_kind  ) then
+            if(cld_cover_3d(i,j,k+1) > cld_bld_coverage .or.          &
+               cld_cover_3d(i,j,k-1) > cld_bld_coverage  ) then
                  if( cloudqvis > q_bk(i,j,k) ) then
                     qtemp = q_bk(i,j,k) + 0.7_r_single* (cloudqvis-q_bk(i,j,k))
                     if(l_conserve_thetaV) then
@@ -188,7 +192,7 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_c
           !         
           !#############################################
           elseif(cld_cover_3d(i,j,k) > 0.0001_r_kind .and.      &
-                 cld_cover_3d(i,j,k) < 0.6_r_kind ) then
+                 cld_cover_3d(i,j,k) < cld_bld_coverage ) then
              ! if cloud fraction does not represent partial cloud
              if( cldfrabk(i,j,k) < r_cloudfrac_threshold) then
                if( q_bk(i,j,k) < cloudqvis * rh_cld3_p) then
@@ -206,7 +210,7 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_c
                endif
              endif
           !#############################################
-          ! else: cld_cover_3d is > 0.6: cloudy case
+          ! else: cld_cover_3d is > cld_bld_coverage: cloudy case
           !#############################################
           else   ! set qv at 102%RH
              if( q_bk(i,j,k) < cloudqvis * 1.00_r_single ) then

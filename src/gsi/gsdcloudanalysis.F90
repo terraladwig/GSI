@@ -1240,6 +1240,7 @@ subroutine  gsdcloudanalysis(mype)
 !
 !
   call cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_cloudfrac_threshold, &
+                 cld_bld_coverage, &
                  lat2,lon2,nsig,q_bk,t_bk,p_bk,cldfrabk,      &
                  cld_cover_3d,wthr_type_2d,cldwater_3d,cldice_3d,sumqci,qv_max_inc, l_saturate_bkCloud)
 
