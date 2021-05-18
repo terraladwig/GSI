@@ -273,7 +273,7 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
          allocate(cdiagbuf(nobs*nsig),rdiagbuf(nreal,nobs*nsig))
          rdiagbuf=zero
      endif
-     if (i_cloud_q_innovation == 2 .or. i_cloud_q_innovation == 3) then
+     if (i_cloud_q_innovation .ge. 20 .or. i_cloud_q_innovation == 3) then
          iip=0
          allocate(cdiagbufp(nobs*nsig),rdiagbufp(nreal,nobs*nsig))
          cdiagbufp="EMPTY"
@@ -461,7 +461,7 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
              cycle
          endif
    
-         call cloudCover_surface_col(mype,nsig,cld_bld_hgt,h_bk,z_bk, &
+         call cloudCover_surface_col(mype,nsig,i_cloud_q_innovation,cld_bld_hgt,h_bk,z_bk, &
                  nvarcld_p,ocld,oelvtn,wthr_type,pcp_type_obs,vis2qc,cld_cover_obs)
    
    
@@ -516,13 +516,14 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
                 muse(i)=.true.
    
            !*******************************************************************************
-               if (i_cloud_q_innovation /= 2) then
-                   write(*,*) "Warning - setupcldtot: this code version is only designed for i_cloud_q_innovation == 2"
+               if (i_cloud_q_innovation .lt. 20 .or. i_cloud_q_innovation .gt. 22 ) then
+                   write(*,*) "Warning - setupcldtot: this code version is only designed for i_cloud_q_innovation == 20,21,22"
                    return
                else
    
 !!!!!Warning you hard coded q values here
-               warning_your_hard_coded_values_here: associate(is=>4,ibin=>1)
+
+               !warning_your_hard_coded_values_here: associate(is=>4,ibin=>1)
                      !ibin = 1 ! q ob bin
                      !is = 4   ! q ob type number, these come from list in gsiparm
 
@@ -536,6 +537,10 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
                    ! values are unique, variable "is" itself is a higher level
                    ! looping index with an intent(in) attribute, thus should
                    ! not be modified within this routine.
+
+                   ibin = 1 ! q ob bin
+                   is = 3   ! q ob type number, these come from list in gsiparm
+
        
                    allocate(my_headq)
                    call qNode_appendto(my_headq,qhead(ibin))
@@ -566,6 +571,8 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
                            ddiff=qv_ob-q_bk(k)
                            q_build0_count=q_build0_count+1
                        endif
+                       ! build error = 80%
+                       error=one/(cloudqvis*8.E-01_r_kind)
        
                    elseif (qob > -0.000001_r_single) then
                        
@@ -578,13 +585,16 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
                            ddiff=qv_ob-q_bk(k) 
                            q_clear0_count=q_clear0_count+1
                        endif
+                       ! clear error = 30%
+                       error=one/(cloudqvis*3.E-01_r_kind)
                    else
                        cycle
                    endif
        
                    q_obcount=q_obcount+1
        
-                   error=one/(cloudqvis*3.E-01_r_kind)
+                   ! all obs errors = 30%
+                   !error=one/(cloudqvis*3.E-01_r_kind)
                    ratio_errors=1.0_r_kind
                    val = error*ddiff
        
@@ -712,7 +722,8 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
 
   !! Write information to diagnostic file
   if(conv_diagsave)then
-     if (i_cloud_q_innovation == 2 .and. iip>0) then
+     if (i_cloud_q_innovation .ge. 20 .and. iip>0) then
+         call dtime_show(myname,'diagsave:q',i_q_ob_type)
         if(netcdf_diag) call nc_diag_write
         if(binary_diag)then
            write(7)'  q',nchar,nreal,iip,mype,ioff0
@@ -728,6 +739,9 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
          write(*,*) "Setupcldtot: DIAG not setup for i_cloud_q_innovation == 3!!!"
      endif
   endif
+
+
+  is = 81
 
   ! Release memory of local guess arrays
   call final_vars_
