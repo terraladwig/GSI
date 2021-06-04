@@ -1723,9 +1723,8 @@ contains
     real(r_kind),dimension(:,:  ),pointer::ges_ps=>NULL()
     real(r_kind),dimension(:,:,:),pointer::ges_tv=>NULL()
 
-    if (twodvar_regional) return
-    if (fv3_regional) then 
-       if(mype==0)write(6,*)'not setup for fv3_regional in load_gsdpbl_hgt'
+    if (twodvar_regional) then
+       if(mype==0) write(6,*)'not setup for twodvar_regional in load_gsdpbl_hgt'
        return 
     endif
 
@@ -1739,15 +1738,22 @@ contains
        call gsi_bundlegetpointer(gsi_metguess_bundle(jj),'tv' ,ges_tv ,istatus)
        ier=ier+istatus
        if(ier/=0) call die(myname_,'not all fields available, ier=',ier)
+
        do j=1,lon2
           do i=1,lat2
 
              do k=1,nsig
 
-                if (wrf_mass_regional)  pbk(k) = aeta1_ll(k)*(ges_ps_01(i,j)*ten-pt_ll)+aeta2_ll(k)+pt_ll
-		if (nems_nmmb_regional) then
+                if (wrf_mass_regional) then
+                   pbk(k) = aeta1_ll(k)*(ges_ps_01(i,j)*ten-pt_ll)+aeta2_ll(k)+pt_ll
+		elseif (nems_nmmb_regional) then
 		   pbk(k) = aeta1_ll(k)*pdtop_ll + aeta2_ll(k)*(ten*ges_ps(i,j) & 
 		            -pdtop_ll-pt_ll) + pt_ll   			    			    
+                elseif (fv3_regional) then
+                   pbk(k) = ges_prsl(i,j,k,1) * ten
+                else
+                   write(*,*) "Error: not an model option in load_gsdpbl_hgt"
+                   call stop2(1234)
 		end if
 				
 		thetav(k)  = ges_tv(i,j,k)*(r1000/pbk(k))**rd_over_cp_mass

@@ -262,7 +262,7 @@ subroutine read_radar(nread,ndata,nodata,infile,lunout,obstype,twind,sis,hgtl_fu
   if (.not.lexist1 .and. .not.lexist2) return
 
   eradkm=rearth*0.001_r_kind
-  maxobs=2e8
+  maxobs=2e7
   nreal=maxdat
   nchanl=0
   ilon=2
