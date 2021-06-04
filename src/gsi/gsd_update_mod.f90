@@ -669,8 +669,8 @@ subroutine gsd_gen_coast_prox
      workpe=0
 
      ii=0
-     do j=1,lon2
-        do i=1,lat2
+     do j=2,lon2-1
+        do i=2,lat2-1
            ii=ii+1
            worksub(ii)=isli(i,j,1)
         end do
