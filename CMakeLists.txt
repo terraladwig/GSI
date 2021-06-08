@@ -193,9 +193,7 @@ project(GSI)
   # FFLAGS depend on the compiler
   get_filename_component (Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME)
   set(CFLAGS "-I. -DFortranByte=char -DFortranInt=int -DFortranLlong='long long' -O3  -Dfunder")
-  set (CMAKE_Fortran_INC_FLAGS "-I ./ -I ${CORE_INCS} -I ${NETCDF_INCLUDE_DIRS} ")
   set (CFLAGS_N "-I. -DFortranByte=char -DFortranInt=int -DFortranLlong='long long'  -O3  -Dfunder")
-
 
   if(BUILD_CORELIBS )
     message("setting values for corelibs")
@@ -244,6 +242,8 @@ project(GSI)
   find_package( W3EMC )
   find_package( W3NCO )
   find_package( IP )
+
+  set (CMAKE_Fortran_INC_FLAGS "-I ./ -I ${CORE_INCS} -I ${NETCDF_INCLUDE_DIRS} ")
 
   if(BUILD_GSDCLOUD_ARW)
     set(GSDCLOUD_DIR "${CMAKE_SOURCE_DIR}/src/GSD/gsdcloud")
