@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 2.6)
 
   add_executable(initialens.x ${LOCAL_SRC} )
   set_target_properties( initialens.x PROPERTIES COMPILE_FLAGS ${GSI_Fortran_FLAGS} )
-  target_link_libraries( initialens.x ${GSISHAREDLIB} ${GSILIB} ${GSISHAREDLIB} ${WRF_LIBRARIES} 
-         ${NETCDF_Fortran_LIBRARIES} ${MPI_Fortran_LIBRARIES} 
+  target_link_libraries( initialens.x ${GSISHAREDLIB} ${GSILIB} ${GSISHAREDLIB} ${wrflib} ${WRF_LIBRARIES} 
+         ${NETCDF_Fortran_LIBRARIES} ${NETCDF_LIBRARIES} ${MPI_Fortran_LIBRARIES} 
          -L./ ${EXTRA_LINKER_FLAGS} ${CORE_LIBRARIES} ${CORE_BUILT}
-         ${GSI_LDFLAGS} ${NCDIAG_LIBRARIES} ${wrflib} )
+         ${GSI_LDFLAGS} ${NCDIAG_LIBRARIES} )
   add_dependencies(initialens.x ${GSILIB})
