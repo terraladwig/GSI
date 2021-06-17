@@ -101,14 +101,24 @@ elif [[ -d /glade ]] ; then
 ################# Orion ####################
 elif [[ -d /work/noaa ]] ; then  ### orion
     module purge
-    module load intel/2018.4
-    module load impi/2018.4
-    module load netcdf/4.7.2
+    module load cmake/3.17.3
 
-    module use /apps/contrib/NCEP/libs/hpc-stack/modulefiles/stack 
+# Load python
+    module load python/3.7.5
+
+# Load hpc-stack
+    module use /apps/contrib/NCEP/libs/hpc-stack/modulefiles/stack
     module load hpc/1.1.0
+
     module load hpc-intel/2018.4
+    module unload mkl/2020.2
+    module load mkl/2018.4
     module load hpc-impi/2018.4
+
+# Load production utilities
+    module load prod_util/1.2.2
+
+# Load nceplibs
     module load bufr/11.4.0
     module load ip/3.3.3
     module load nemsio/2.5.2
@@ -119,8 +129,8 @@ elif [[ -d /work/noaa ]] ; then  ### orion
     module load w3emc/2.7.3
     module load bacio/2.4.1
     module load crtm/2.3.0
+    module load netcdf/4.7.4
     module load wrf_io/1.2.0
-    module load cmake
 
 ################# WCOSS_C Cray ####################
 elif [[ -d /cm ]] ; then 
