@@ -96,6 +96,8 @@ contains
     if(nobs == 0) return
 
         ! try data header
+    write (*,*) 'cldtot_Oper', mype, i_cloud_q_innovation
+    write (*,*) obstype,isis,nreal,nchanl
     read(lunin,iostat=ier) obstype,isis,nreal,nchanl
         if(ier/=0) then
           call perr(myname_,'read(obstype,...), iostat =',ier)

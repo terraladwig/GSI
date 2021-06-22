@@ -245,6 +245,9 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
 ! If require guess vars available, extract from bundle ...
   call init_vars_
 
+  write (*,*) 'setupcldtot', mype
+
+
   allocate(h_bk(nsig))
   allocate(t_bk(nsig))
   allocate(q_bk(nsig))

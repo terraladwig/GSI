@@ -484,6 +484,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
           is_obOper => obOper_create(dtype(is))
 
           if(associated(is_obOper)) then
+            write(*,*) 'setuprhsall', trim(dtype(is)), is
             call is_obOper%setup(lunin,mype, is, nsat1(is), init_pass,last_pass)
             call obOper_destroy(is_obOper)
 
