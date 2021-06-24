@@ -543,7 +543,7 @@ subroutine setuprhsall(ndata,mype,init_pass,last_pass)
   ! not sure why it won't work even in case of .not.luse_obsdiag.
 
   if(.not.(l_PBL_pseudo_SurfobsT  .or.  l_PBL_pseudo_SurfobsQ   .or. &
-           l_PBL_pseudo_SurfobsUV .or. (i_cloud_q_innovation.ge.1)) ) then
+           l_PBL_pseudo_SurfobsUV .or. (i_cloud_q_innovation>0)) ) then
      call obsdiags_sort()
   endif
 

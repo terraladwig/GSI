@@ -273,7 +273,7 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
          allocate(cdiagbuf(nobs*nsig),rdiagbuf(nreal,nobs*nsig))
          rdiagbuf=zero
      endif
-     if (i_cloud_q_innovation .ge. 20 .or. i_cloud_q_innovation == 3) then
+     if (i_cloud_q_innovation >= 20 .or. i_cloud_q_innovation == 3) then
          iip=0
          allocate(cdiagbufp(nobs*nsig),rdiagbufp(nreal,nobs*nsig))
          cdiagbufp="EMPTY"
@@ -516,7 +516,7 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
                 muse(i)=.true.
    
            !*******************************************************************************
-               if (i_cloud_q_innovation .lt. 20 .or. i_cloud_q_innovation .gt. 22 ) then
+               if (i_cloud_q_innovation < 20 .or. i_cloud_q_innovation > 22 ) then
                    write(*,*) "Warning - setupcldtot: this code version is only designed for i_cloud_q_innovation == 20,21,22"
                    return
                else
@@ -717,7 +717,7 @@ subroutine setupcldtot(obsLL,odiagLL,lunin,mype,bwork,awork,nele,nobs,is,conv_di
 
   !! Write information to diagnostic file
   if(conv_diagsave)then
-     if (i_cloud_q_innovation .ge. 20 .and. iip>0) then
+     if (i_cloud_q_innovation >= 20 .and. iip>0) then
 !         call dtime_show(myname,'diagsave:q',i_q_ob_type)
         if(netcdf_diag) call nc_diag_write
         if(binary_diag)then
