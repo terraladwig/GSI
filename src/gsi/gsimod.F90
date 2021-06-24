@@ -1201,7 +1201,9 @@
 !      i_cloud_q_innovation - integer to choose if and how cloud obs are used
 !                          0= no innovations 
 !                          1= cloud total innovations
-!                          2= water vapor innovations
+!                          20= cloud build/clear derived water vapor innovations
+!                          21= cloud build derived water vapor innovations
+!                          22= cloud clear derived water vapor innovations
 !                          3= cloud total & water vapor innovations
 !      i_ens_mean    - integer for setupcldtot behavior
 !                           0=single model run
